@@ -19,7 +19,7 @@ analysis:
 
 plots:
   - type: phase_portrait
-    output: damped_lv_phase.png
+    output: damped_lv_phase.pdf
     title: "Damped Lotka-Volterra: stable spiral"
     nullclines: true
     fixed_points: true
@@ -30,7 +30,7 @@ plots:
       t_span: [0, 60]
 
   - type: timeseries
-    output: damped_lv_time.png
+    output: damped_lv_time.pdf
     title: "Damped Lotka-Volterra: approach to equilibrium"
     initial_conditions: [[2.4, 0.6]]
     t_span: [0, 60]

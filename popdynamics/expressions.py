@@ -23,7 +23,7 @@ from typing import Any
 import jax.numpy as jnp
 from jax import Array
 
-__all__ = ["ExpressionError", "ALLOWED_FUNCTIONS", "compile_rhs", "compile_scalar"]
+__all__ = ["ExpressionError", "ALLOWED_FUNCTIONS", "compile_rhs"]
 
 
 class ExpressionError(ValueError):
@@ -141,26 +141,3 @@ def compile_rhs(
 
     rhs.expressions = {name: equations[name] for name in variables}  # for reporting
     return rhs
-
-
-def compile_scalar(
-    expression: str,
-    variables: Sequence[str],
-    parameters: Mapping[str, Any] | None = None,
-    *,
-    where: str = "expression",
-) -> Callable[[Array, Mapping[str, Any]], Array]:
-    """Build a scalar function ``g(y, params)``, e.g. a candidate Lyapunov function."""
-    variables = tuple(variables)
-    parameters = dict(parameters or {})
-    known = set(variables) | set(parameters) | set(ALLOWED_FUNCTIONS)
-    code = _parse(expression, where, known)
-
-    def scalar(y: Array, params: Mapping[str, Any]) -> Array:
-        scope = dict(ALLOWED_FUNCTIONS)
-        scope.update(params)
-        scope.update({name: y[i] for i, name in enumerate(variables)})
-        return jnp.asarray(eval(code, {"__builtins__": {}}, scope), dtype=float)
-
-    scalar.expression = expression
-    return scalar

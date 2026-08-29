@@ -225,6 +225,6 @@ def _build_plots(spec: Any, system: System, source: str) -> tuple[PlotSpec, ...]
                 f"one has {system.ndim} ({', '.join(system.names)})"
             )
         options = {k: v for k, v in entry.items() if k not in ("type", "output")}
-        output = entry.get("output") or f"{Path(source).stem}_{kind}_{i}.png"
+        output = entry.get("output") or f"{Path(source).stem}_{kind}_{i}.pdf"
         plots.append(PlotSpec(type=kind, output=str(output), options=options))
     return tuple(plots)

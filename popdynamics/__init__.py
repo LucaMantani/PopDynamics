@@ -1,8 +1,9 @@
 """PopDynamics: a JAX-based framework for studying population dynamics.
 
 Define a system of first-order autonomous ODEs once, then get time evolution,
-phase portraits with nullclines and vector fields, fixed points classified by
-linear stability, and Lyapunov-function checking.
+phase portraits with nullclines and vector fields, and fixed points classified
+by linear stability -- from Python, or from a runcard via the ``pop-dyn``
+command.
 """
 
 # This must run before any other jax import so every array defaults to float64.

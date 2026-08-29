@@ -17,6 +17,11 @@ import matplotlib
 matplotlib.use("Agg")  # a CLI writes files; it never opens a window
 import matplotlib.pyplot as plt
 
+# Figures default to vector PDF. Embed TrueType rather than matplotlib's default
+# Type 3 fonts, which many journals reject; harmless for raster formats.
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
+
 from popdynamics.analysis import classify, fixed_points
 from popdynamics.integrate import IntegrationError
 from popdynamics.plotting import plot_phase_portrait, plot_timeseries
@@ -122,6 +127,7 @@ def run(runcard: Runcard, outdir: Path) -> list[Path]:
         figure.tight_layout()
         path = outdir / spec.output
         path.parent.mkdir(parents=True, exist_ok=True)
+        # dpi only affects raster formats; a .pdf output stays vector.
         figure.savefig(path, dpi=150)
         plt.close(figure)
         written.append(path)

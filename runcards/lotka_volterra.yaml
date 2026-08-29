@@ -16,7 +16,7 @@ analysis:
 
 plots:
   - type: phase_portrait
-    output: lotka_volterra_phase.png
+    output: lotka_volterra_phase.pdf
     title: "Lotka-Volterra: closed orbits around a centre"
     trajectories:
       initial_conditions: [[1.4, 1.0], [1.9, 1.0], [2.4, 1.0]]

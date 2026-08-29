@@ -15,9 +15,9 @@ from jax import Array
 class System:
     """An autonomous system of first-order ODEs ``dy/dt = f(y; params)``.
 
-    Autonomy is assumed throughout the package: fixed points, nullclines,
-    conserved quantities and Lyapunov functions are only well defined when the
-    right-hand side has no explicit time dependence.
+    Autonomy is assumed throughout the package: fixed points and nullclines
+    are only well defined when the right-hand side has no explicit time
+    dependence.
 
     Parameters
     ----------

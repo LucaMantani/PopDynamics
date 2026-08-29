@@ -19,7 +19,7 @@ analysis:
 
 plots:
   - type: phase_portrait
-    output: competition_phase.png
+    output: competition_phase.pdf
     title: "Competitive exclusion: two basins split by a saddle"
     trajectories:
       initial_conditions: [[0.50, 0.45], [0.45, 0.50], [1.2, 1.1], [1.1, 1.2]]
