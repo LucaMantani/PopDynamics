@@ -25,6 +25,12 @@ __all__ = ["Runcard", "RuncardError", "PlotSpec", "load", "from_dict", "PLOT_TYP
 
 PLOT_TYPES = ("phase_portrait", "timeseries")
 
+# How many state variables each plot type needs; None means any number.
+PLOT_DIMENSIONS: dict[str, int | None] = {
+    "phase_portrait": 2,
+    "timeseries": None,
+}
+
 _TOP_LEVEL = {"name", "system", "domain", "analysis", "plots"}
 _SYSTEM_KEYS = {"variables", "equations", "parameters", "model"}
 _ANALYSIS_KEYS = {"fixed_points"}
@@ -88,7 +94,7 @@ def from_dict(data: Any, *, source: str = "<dict>") -> Runcard:
     name = str(data.get("name", Path(source).stem))
     domain = _build_domain(data.get("domain"), system, source)
     analysis = _build_analysis(data.get("analysis"), source)
-    plots = _build_plots(data.get("plots"), source)
+    plots = _build_plots(data.get("plots"), system, source)
     return Runcard(
         name=name, system=system, domain=domain, plots=plots,
         analysis=analysis, source=source,
@@ -196,7 +202,7 @@ def _build_analysis(spec: Any, source: str) -> dict[str, Any]:
     return dict(spec)
 
 
-def _build_plots(spec: Any, source: str) -> tuple[PlotSpec, ...]:
+def _build_plots(spec: Any, system: System, source: str) -> tuple[PlotSpec, ...]:
     if spec is None:
         return ()
     if not isinstance(spec, list):
@@ -212,6 +218,12 @@ def _build_plots(spec: Any, source: str) -> tuple[PlotSpec, ...]:
         kind = entry["type"]
         if kind not in PLOT_TYPES:
             raise RuncardError(f"{where}: unknown plot type {kind!r}; allowed are {list(PLOT_TYPES)}")
+        needed = PLOT_DIMENSIONS[kind]
+        if needed is not None and system.ndim != needed:
+            raise RuncardError(
+                f"{where}: a {kind!r} plot needs a {needed}-variable system, but this "
+                f"one has {system.ndim} ({', '.join(system.names)})"
+            )
         options = {k: v for k, v in entry.items() if k not in ("type", "output")}
         output = entry.get("output") or f"{Path(source).stem}_{kind}_{i}.png"
         plots.append(PlotSpec(type=kind, output=str(output), options=options))

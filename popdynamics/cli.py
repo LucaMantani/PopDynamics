@@ -18,6 +18,7 @@ matplotlib.use("Agg")  # a CLI writes files; it never opens a window
 import matplotlib.pyplot as plt
 
 from popdynamics.analysis import classify, fixed_points
+from popdynamics.integrate import IntegrationError
 from popdynamics.plotting import plot_phase_portrait, plot_timeseries
 from popdynamics.runcard import Runcard, RuncardError, load
 from popdynamics.system import System
@@ -112,7 +113,12 @@ def run(runcard: Runcard, outdir: Path) -> list[Path]:
         written.append(path)
 
     for spec in runcard.plots:
-        figure = _DISPATCH[spec.type](runcard, spec.options)
+        try:
+            figure = _DISPATCH[spec.type](runcard, spec.options)
+        except (ValueError, IntegrationError) as exc:
+            if isinstance(exc, RuncardError):
+                raise
+            raise RuncardError(f"plot {spec.output!r} ({spec.type}): {exc}") from None
         figure.tight_layout()
         path = outdir / spec.output
         path.parent.mkdir(parents=True, exist_ok=True)

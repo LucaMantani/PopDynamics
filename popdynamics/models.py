@@ -11,7 +11,7 @@ import jax.numpy as jnp
 
 from popdynamics.system import System
 
-__all__ = ["logistic", "lotka_volterra", "damped_lotka_volterra"]
+__all__ = ["logistic", "r_plus_sN", "lotka_volterra", "damped_lotka_volterra"]
 
 
 def logistic(r: float = 1.0, K: float = 1.0) -> System:
@@ -26,6 +26,25 @@ def logistic(r: float = 1.0, K: float = 1.0) -> System:
         return jnp.array([p["r"] * N * (1.0 - N / p["K"])])
 
     return System(rhs=rhs, names=("N",), params={"r": r, "K": K})
+
+
+def r_plus_sN(r: float = 1.0, s: float = -1.0) -> System:
+    """Quadratic growth ``dN/dt = r N + s N^2``, the form used in the notes.
+
+    Both fixed points sit at ``N = 0`` and ``N = -r/s``, and the sign of ``s``
+    decides what the second one means:
+
+    - ``s < 0`` (with ``r > 0``): ``-r/s`` is a stable carrying capacity ``K``,
+      with ``f'(K) = -r < 0``.
+    - ``s > 0`` (with ``r < 0``): ``-r/s`` is an unstable Allee threshold, with
+      ``f'`` of the opposite sign; below it the population collapses to zero.
+    """
+
+    def rhs(y, p):
+        (N,) = y
+        return jnp.array([p["r"] * N + p["s"] * N**2])
+
+    return System(rhs=rhs, names=("N",), params={"r": r, "s": s})
 
 
 def lotka_volterra(alpha: float = 1.0) -> System:

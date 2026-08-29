@@ -9,7 +9,11 @@ import jax.numpy as jnp
 
 from popdynamics.system import System, Trajectory
 
-__all__ = ["integrate"]
+__all__ = ["IntegrationError", "integrate"]
+
+
+class IntegrationError(RuntimeError):
+    """Raised when a trajectory could not be integrated over the whole span."""
 
 
 def integrate(
@@ -44,6 +48,8 @@ def integrate(
         lambda t, y, args: jnp.asarray(system.rhs(y, args), dtype=float)
     )
 
+    # throw=False so a failure comes back as a result code we can explain,
+    # rather than an error raised from inside the compiled solver.
     sol = diffrax.diffeqsolve(
         term,
         solver if solver is not None else diffrax.Tsit5(),
@@ -55,5 +61,18 @@ def integrate(
         stepsize_controller=diffrax.PIDController(rtol=rtol, atol=atol),
         saveat=diffrax.SaveAt(ts=ts),
         max_steps=max_steps,
+        throw=False,
     )
+    if sol.result != diffrax.RESULTS.successful:
+        # str(result) is a repr wrapping the message in the enum's class name;
+        # take just the message so the error reads as a sentence.
+        detail = str(sol.result)
+        if "<" in detail:
+            detail = detail[detail.index("<") + 1 : detail.rindex(">")]
+        raise IntegrationError(
+            f"could not integrate from y0={list(map(float, y0))} over {(t0, t1)}: "
+            f"{detail} A population model that grows without bound reaches "
+            f"infinity in finite time, which no step size can cross -- check "
+            f"whether this initial condition escapes, or shorten t_span."
+        )
     return Trajectory(ts=sol.ts, ys=sol.ys, system=system)
