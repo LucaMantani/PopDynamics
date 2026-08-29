@@ -1,0 +1,36 @@
+name: damped_lv
+
+system:
+  variables: [u, v]
+  equations:
+    u: u * (1 - v - mu1 * u)
+    v: alpha * v * (u - 1 - mu2 * v)
+  parameters:
+    alpha: 1.0
+    mu1: 0.1
+    mu2: 0.1
+
+domain:
+  u: [0.0, 2.6]
+  v: [0.0, 2.6]
+
+analysis:
+  fixed_points: true
+
+plots:
+  - type: phase_portrait
+    output: damped_lv_phase.png
+    title: "Damped Lotka-Volterra: stable spiral"
+    nullclines: true
+    fixed_points: true
+    vector_field:
+      density: 23
+    trajectories:
+      initial_conditions: [[2.4, 0.6], [0.4, 1.9]]
+      t_span: [0, 60]
+
+  - type: timeseries
+    output: damped_lv_time.png
+    title: "Damped Lotka-Volterra: approach to equilibrium"
+    initial_conditions: [[2.4, 0.6]]
+    t_span: [0, 60]

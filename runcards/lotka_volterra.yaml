@@ -1,0 +1,23 @@
+# The model shorthand: pull a system from popdynamics.models by name and
+# override its parameters, instead of spelling out the equations.
+name: lotka_volterra
+
+system:
+  model: lotka_volterra
+  parameters:
+    alpha: 1.0
+
+domain:
+  u: [0.0, 2.6]
+  v: [0.0, 2.6]
+
+analysis:
+  fixed_points: true
+
+plots:
+  - type: phase_portrait
+    output: lotka_volterra_phase.png
+    title: "Lotka-Volterra: closed orbits around a centre"
+    trajectories:
+      initial_conditions: [[1.4, 1.0], [1.9, 1.0], [2.4, 1.0]]
+      t_span: [0, 12]
