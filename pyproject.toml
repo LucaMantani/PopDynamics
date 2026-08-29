@@ -1,0 +1,39 @@
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.1.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+
+[tool.poetry]
+name = "popdynamics"
+version = "0.0.1"
+authors = [ "Luca Mantani" ]
+description = "A framework for population dynamics"
+repository = "https://github.com/LucaMantani/PopDynamics"
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = ">=3.12"
+prompt_toolkit = "*"
+h5py = "*"
+
+jax = "*"
+optax = "*"
+flax = "*"
+
+# Mark Sphinx and its extensions optional:
+sphinx = {version="*", optional=true}
+sphinxcontrib-bibtex = {version="*", optional=true}
+sphinx-rtd-theme = {version="*", optional=true}
+tabulate = {version="*", optional=true}
+sphinx-copybutton = {version="*", optional=true}
+
+
+[tool.poetry.extras]
+doc = ["sphinxcontrib-bibtex", "sphinx-rtd-theme", "sphinx", "tabulate", "sphinx-copybutton"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning:importlib",
+]
