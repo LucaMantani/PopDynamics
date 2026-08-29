@@ -36,7 +36,7 @@ def logistic(r: float = 1.0, K: float = 1.0) -> System:
 
 
 def r_plus_sN(r: float = 1.0, s: float = -1.0) -> System:
-    """Quadratic growth ``dN/dt = r N + s N^2``, the form used in the notes.
+    """Quadratic growth ``dN/dt = r N + s N^2``.
 
     Both fixed points sit at ``N = 0`` and ``N = -r/s``, and the sign of ``s``
     decides what the second one means:
