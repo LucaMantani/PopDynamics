@@ -21,7 +21,14 @@ from popdynamics.analysis import (
     jacobian,
 )
 from popdynamics.integrate import integrate
-from popdynamics.plotting import plot_timeseries
+from popdynamics.plotting import (
+    plot_fixed_points,
+    plot_nullclines,
+    plot_phase_portrait,
+    plot_timeseries,
+    plot_trajectories,
+    plot_vector_field,
+)
 from popdynamics.system import System, Trajectory
 
 __all__ = [
@@ -34,5 +41,10 @@ __all__ = [
     "classify",
     "FixedPoint",
     "plot_timeseries",
+    "plot_vector_field",
+    "plot_nullclines",
+    "plot_fixed_points",
+    "plot_trajectories",
+    "plot_phase_portrait",
     "models",
 ]
