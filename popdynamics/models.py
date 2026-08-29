@@ -11,7 +11,7 @@ import jax.numpy as jnp
 
 from popdynamics.system import System
 
-__all__ = ["logistic", "lotka_volterra"]
+__all__ = ["logistic", "lotka_volterra", "damped_lotka_volterra"]
 
 
 def logistic(r: float = 1.0, K: float = 1.0) -> System:
@@ -41,3 +41,29 @@ def lotka_volterra(alpha: float = 1.0) -> System:
         return jnp.array([u * (1.0 - v), p["alpha"] * v * (u - 1.0)])
 
     return System(rhs=rhs, names=("u", "v"), params={"alpha": alpha})
+
+
+def damped_lotka_volterra(
+    alpha: float = 1.0, mu1: float = 0.1, mu2: float = 0.1
+) -> System:
+    """Logistically-limited predator-prey.
+
+    ``du/dt = u(1 - v - mu1 u)``, ``dv/dt = alpha v(u - 1 - mu2 v)``.
+
+    The self-limitation terms destroy the conserved quantity of
+    :func:`lotka_volterra`, turning the centre at ``(1, 1)`` into a stable
+    spiral at ``u* = (1+mu2)/(1+mu1 mu2)``, ``v* = (1-mu1)/(1+mu1 mu2)``.
+    """
+
+    def rhs(y, p):
+        u, v = y
+        return jnp.array(
+            [
+                u * (1.0 - v - p["mu1"] * u),
+                p["alpha"] * v * (u - 1.0 - p["mu2"] * v),
+            ]
+        )
+
+    return System(
+        rhs=rhs, names=("u", "v"), params={"alpha": alpha, "mu1": mu1, "mu2": mu2}
+    )

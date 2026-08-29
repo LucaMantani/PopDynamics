@@ -13,6 +13,13 @@ import jax as _jax
 _jax.config.update("jax_enable_x64", True)
 
 from popdynamics import models
+from popdynamics.analysis import (
+    FixedPoint,
+    classify,
+    eigenvalues,
+    fixed_points,
+    jacobian,
+)
 from popdynamics.integrate import integrate
 from popdynamics.plotting import plot_timeseries
 from popdynamics.system import System, Trajectory
@@ -21,6 +28,11 @@ __all__ = [
     "System",
     "Trajectory",
     "integrate",
+    "jacobian",
+    "eigenvalues",
+    "fixed_points",
+    "classify",
+    "FixedPoint",
     "plot_timeseries",
     "models",
 ]
