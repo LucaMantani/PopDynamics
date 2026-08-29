@@ -1,0 +1,26 @@
+# Strong competition (a12, a21 > 1): the interior fixed point is a saddle and
+# the system is bistable, so whichever species starts ahead excludes the other.
+# Uses the 'model:' shorthand rather than spelling out the equations.
+name: competition
+
+system:
+  model: competition
+  parameters:
+    a12: 1.5
+    a21: 1.5
+    rho: 1.0
+
+domain:
+  u: [0.0, 1.5]
+  v: [0.0, 1.5]
+
+analysis:
+  fixed_points: true
+
+plots:
+  - type: phase_portrait
+    output: competition_phase.png
+    title: "Competitive exclusion: two basins split by a saddle"
+    trajectories:
+      initial_conditions: [[0.50, 0.45], [0.45, 0.50], [1.2, 1.1], [1.1, 1.2]]
+      t_span: [0, 25]

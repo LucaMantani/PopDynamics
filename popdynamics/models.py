@@ -11,7 +11,14 @@ import jax.numpy as jnp
 
 from popdynamics.system import System
 
-__all__ = ["logistic", "r_plus_sN", "lotka_volterra", "damped_lotka_volterra"]
+__all__ = [
+    "logistic",
+    "r_plus_sN",
+    "lotka_volterra",
+    "damped_lotka_volterra",
+    "competition",
+    "mutualism",
+]
 
 
 def logistic(r: float = 1.0, K: float = 1.0) -> System:
@@ -85,4 +92,66 @@ def damped_lotka_volterra(
 
     return System(
         rhs=rhs, names=("u", "v"), params={"alpha": alpha, "mu1": mu1, "mu2": mu2}
+    )
+
+
+def competition(a12: float = 0.5, a21: float = 0.5, rho: float = 1.0) -> System:
+    """Two species competing for one resource.
+
+    ``du/dt = u(1 - u - a12 v)``, ``dv/dt = rho v(1 - v - a21 u)``, in the
+    dimensionless form where each species alone saturates at 1. ``a12`` is how
+    strongly ``v`` suppresses ``u``, and ``rho`` the relative timescale.
+
+    The nullclines are two straight lines, and where they cross decides the
+    outcome. The interior fixed point sits at
+    ``u* = (1-a12)/(1-a12 a21)``, ``v* = (1-a21)/(1-a12 a21)``, and since
+    ``det J = rho u* v* (1 - a12 a21)`` while ``Tr J = -(u* + rho v*) < 0``:
+
+    - ``a12, a21 < 1`` (weak competition): coexistence, a stable node.
+    - ``a12, a21 > 1`` (strong competition): the interior point is a saddle and
+      the system is bistable -- whichever species starts ahead excludes the
+      other. This is competitive exclusion.
+    - one above and one below 1: no interior point in the positive quadrant, and
+      the stronger competitor always wins.
+    """
+
+    def rhs(y, p):
+        u, v = y
+        return jnp.array(
+            [
+                u * (1.0 - u - p["a12"] * v),
+                p["rho"] * v * (1.0 - v - p["a21"] * u),
+            ]
+        )
+
+    return System(
+        rhs=rhs, names=("u", "v"), params={"a12": a12, "a21": a21, "rho": rho}
+    )
+
+
+def mutualism(a12: float = 0.5, a21: float = 0.5, rho: float = 1.0) -> System:
+    """Two species that benefit one another.
+
+    ``du/dt = u(1 - u + a12 v)``, ``dv/dt = rho v(1 - v + a21 u)`` -- the same
+    form as :func:`competition` with the interaction signs flipped, so each
+    species raises the other's effective carrying capacity.
+
+    The interior fixed point is at ``u* = (1+a12)/(1-a12 a21)``,
+    ``v* = (1+a21)/(1-a12 a21)``, which is positive and stable only while
+    ``a12 a21 < 1``. Beyond that the denominator changes sign: mutual benefit
+    outruns self-limitation and both populations grow without bound, so there is
+    no equilibrium to find at all.
+    """
+
+    def rhs(y, p):
+        u, v = y
+        return jnp.array(
+            [
+                u * (1.0 - u + p["a12"] * v),
+                p["rho"] * v * (1.0 - v + p["a21"] * u),
+            ]
+        )
+
+    return System(
+        rhs=rhs, names=("u", "v"), params={"a12": a12, "a21": a21, "rho": rho}
     )
